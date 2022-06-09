@@ -1,0 +1,25 @@
+{
+  "name": "koa-youtube-download",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luojiyin1987/koa-youtube-download.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luojiyin1987/koa-youtube-download/issues"
+  },
+  "homepage": "https://github.com/luojiyin1987/koa-youtube-download#readme",
+  "dependencies": {
+    "koa": "^2.13.4",
+    "koa-router": "^10.1.1",
+    "koa-static": "^5.0.0"
+  }
+}
