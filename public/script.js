@@ -2,7 +2,7 @@ const downloadBtn = document.querySelector(".download-button");
 const URLinput = document.querySelector(".URL-input");
 const goFinishBtn = document.querySelector(".ok-button");
 
-console.log('downloadBtn: ', downloadBtn, URLinput,goFinishBtn);
+
 downloadBtn.addEventListener("click", () => {
     console.log(`URL: ${URLinput.value}`);
     sendURL(URLinput.value);
@@ -14,20 +14,22 @@ goFinishBtn.addEventListener("click", () => {
 
 
 function goToFinish() {
-    window.location.href = window.location.href + 'download';
+    window.location.href = window.location.href + 'downloaded';
 }
 
 function sendURL(URL) {
-    $.ajax({
-        type: "POST",
-        //the url where you want to sent the userName and password to
-        url: "download",
-        dataType: "application/json",
-        async: true,
-        //json object to sent to the authentication url
-        data: { URL: URL },
-        complete: function (text) {
-            alert(text.responseText);
-        }
-    });
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "download", true);
+
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    xhr.complete = function (text) {
+        alert(text.responseText);
+    }
+
+    const data = { URL: URL };
+    xhr.send(JSON.stringify(data));
+
+
+
 }
