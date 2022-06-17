@@ -1,8 +1,10 @@
 const serve = require('koa-static');
 const Koa = require('koa');
 const router = require('koa-router')();
+const  bodyParser = require('koa-bodyparser');
 const fs = require('fs');
 const path = require('path');
+const  { exec } = require('child_process');
 const app = new Koa();
 
 
@@ -26,18 +28,33 @@ async function createUrl(dirName) {
     })
 }
 
-
+function youtubeDownload(url, next) {
+    const cmd = `cd ./download/ &&  yt-dlp  ${url}`;
+    exec(cmd, (error, stdout, stderr) => {
+        next({result: Number(!!error), data: error ? stderr : 'download Success'});
+    })
+}
 
 
 router.get('/downloaded',  async ctx => {
      ctx.body = await createUrl('downloaded');
 })
 
+router.post('/download', async ctx =>{
+    console.log(ctx.request.body);
+    const { URL } = ctx.request.body;
+    ctx.body   = await youtubeDownload(URL, ctx.next);
+    
+})
+
 // or use absolute paths
 app.use(serve(__dirname + '/public'));
 app.use(serve(__dirname + '/downloaded'));
-
+app.use(bodyParser({
+    enableTypes:['json', 'form', 'text']
+  }));
 app.use(router.routes());
+
 
 app.listen(3000);
 
