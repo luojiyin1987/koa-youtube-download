@@ -1,32 +1,44 @@
+const serve = require('koa-static');
 const Koa = require('koa');
-const Router = require('koa-router');
+const router = require('koa-router')();
+const fs = require('fs');
 const path = require('path');
-const static = require('koa-static');
-
 const app = new Koa();
-const router = new Router();
-
-const staticPath = './public';
-app.use(static(path.join(__dirname, staticPath)));
-
-router.get('/', async ( ctx )=>{
-    let html = `
-      <ul>
-        <li><a href="/page/helloworld">/page/helloworld</a></li>
-        <li><a href="/page/404">/page/404</a></li>
-      </ul>
-    `
-    ctx.body = html
-  })
-
-app
-    .use(router.routes())
-    .use(router.allowedMethods);
 
 
+async function createUrl(dirName) {
+    return new Promise((resolve, reject) => {
+        const filePath = path.join(__dirname, dirName);
+        const fileArray = [];
+        fs.readdir(filePath, (err, files) => {
+            if (err) {
+                reject(err);
+            }
+
+            files.forEach((file) => {
+                console.log(file);
+                fileArray.push(`<li>Download <a href="/${file}">${file}</a></li>`);
+            })
+            console.log('fileArray', fileArray);
+            resolve(`<ul>${fileArray.join('')}</ul>`);
+        })
+
+    })
+}
 
 
 
-app.listen(3000, () => {
-    console.log('server running at port 3000');
+
+router.get('/downloaded',  async ctx => {
+     ctx.body = await createUrl('downloaded');
 })
+
+// or use absolute paths
+app.use(serve(__dirname + '/public'));
+app.use(serve(__dirname + '/downloaded'));
+
+app.use(router.routes());
+
+app.listen(3000);
+
+console.log('listening on port 3000');
