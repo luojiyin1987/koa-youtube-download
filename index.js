@@ -17,7 +17,7 @@ async function createUrl(dirName) {
 
             files.forEach((file) => {
                 console.log(file);
-                fileArray.push(`<li>Download <a href="/${file}">${file}</a></li>`);
+                fileArray.push(`<li> <a href="/${file}">${file}</a></li>`);
             })
             console.log('fileArray', fileArray);
             resolve(`<ul>${fileArray.join('')}</ul>`);
