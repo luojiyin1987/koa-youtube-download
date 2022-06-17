@@ -28,10 +28,10 @@ async function createUrl(dirName) {
     })
 }
 
-function youtubeDownload(url, next) {
-    const cmd = `cd ./download/ &&  yt-dlp  ${url}`;
+ async function youtubeDownload(url) {
+    const cmd = `cd ./downloaded/ &&  yt-dlp  ${url}`;
     exec(cmd, (error, stdout, stderr) => {
-        next({result: Number(!!error), data: error ? stderr : 'download Success'});
+         return  {result: Number(!!error), data: (error ? stderr : 'download Success')};
     })
 }
 
@@ -43,7 +43,7 @@ router.get('/downloaded',  async ctx => {
 router.post('/download', async ctx =>{
     console.log(ctx.request.body);
     const { URL } = ctx.request.body;
-    ctx.body   = await youtubeDownload(URL, ctx.next);
+    ctx.body   = await youtubeDownload(URL);
     
 })
 
