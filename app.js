@@ -1,12 +1,14 @@
 const serve = require('koa-static');
 const Koa = require('koa');
 const router = require('koa-router')();
-const  bodyParser = require('koa-bodyparser');
+const bodyParser = require('koa-bodyparser');
 const fs = require('fs');
 const path = require('path');
-const  { exec } = require('child_process');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const app = new Koa();
 
+const downloadIng = {};
 
 async function createUrl(dirName) {
     return new Promise((resolve, reject) => {
@@ -28,31 +30,46 @@ async function createUrl(dirName) {
     })
 }
 
- async function youtubeDownload(url) {
+async function youtubeDownload(url) {
     const cmd = `cd ./downloaded/ &&  yt-dlp  ${url}`;
-    exec(cmd, (error, stdout, stderr) => {
-         return  {result: Number(!!error), data: (error ? stderr : 'download Success')};
+
+    return new Promise((resolved, reject) => {
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                console.err("download error", error);
+                reject(error);
+            }
+            console.log(stdout ? stdout : stderr);
+            resolved(stdout ? 1 : stderr)
+        })
     })
 }
 
 
-router.get('/downloaded',  async ctx => {
-     ctx.body = await createUrl('downloaded');
+
+router.get('/downloaded', async ctx => {
+    ctx.body = await createUrl('downloaded');
 })
 
-router.post('/download', async ctx =>{
+router.post('/download', async ctx => {
     console.log(ctx.request.body);
     const { URL } = ctx.request.body;
-    ctx.body   = await youtubeDownload(URL);
-    
+    if (downloadIng[URL]) {
+        ctx.body = {msg:'this URL is downloading'}
+    } else { 
+        downloadIng[URL] = true;
+        ctx.body = await youtubeDownload(URL);
+        delete downloadIng[URL]
+    }
 })
+     
 
 // or use absolute paths
 app.use(serve(__dirname + '/public'));
 app.use(serve(__dirname + '/downloaded'));
 app.use(bodyParser({
-    enableTypes:['json', 'form', 'text']
-  }));
+    enableTypes: ['json', 'form', 'text']
+}));
 app.use(router.routes());
 
 
